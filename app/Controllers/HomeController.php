@@ -1,34 +1,62 @@
 <?php
 
-// Active le mode strict pour la vérification des types
 declare(strict_types=1);
-// Déclare l'espace de noms pour ce contrôleur
-namespace Mini\Controllers;
-// Importe la classe de base Controller du noyau
-use Mini\Core\Controller;
-use Mini\Models\User;
 
-// Déclare la classe finale HomeController qui hérite de Controller
+namespace Mini\Controllers;
+
+use Mini\Core\Controller;
+use Mini\Models\Product;
+use Mini\Models\Category;
+
+/**
+ * Contrôleur HomeController - Gère la page d'accueil
+ */
 final class HomeController extends Controller
 {
-    // Déclare la méthode d'action par défaut qui ne retourne rien
+    /**
+     * Affiche la page d'accueil avec les produits vedettes
+     */
     public function index(): void
     {
-        // Appelle le moteur de rendu avec la vue et ses paramètres
-        $this->render('home/index', params: [
-            // Définit le titre transmis à la vue
-            'title' => 'Mini MVC',
-            'prenom' => 'Toto',
-            'prenom2' => 'Tata',
+        $productModel = new Product();
+        $categoryModel = new Category();
+        
+        // Récupère tous les produits
+        $products = $productModel->getAllWithCategory();
+        // Récupère les catégories avec le compte de produits
+        $categories = $categoryModel->getAllWithCount();
+        
+        $this->render('home/index', [
+            'products' => $products,
+            'categories' => $categories,
+            'pageTitle' => 'Accueil'
         ]);
     }
 
+    /**
+     * Page des utilisateurs (page de test)
+     */
     public function users(): void
     {
-        // Appelle le moteur de rendu avec la vue et ses paramètres
-        $this->render('home/users', params: [
-            // Définit le titre transmis à la vue
-            'users' => $users = User::getAll(),
+        $this->render('home/users', [
+            'users' => ['Alice', 'Bob', 'Charlie'],
         ]);
     }
+
+    /**
+     * Page "À propos"
+     */
+    public function about(): void
+    {
+        $this->render('home/about', ['pageTitle' => 'À propos']);
+    }
+
+    /**
+     * Page de contact
+     */
+    public function contact(): void
+    {
+        $this->render('home/contact', ['pageTitle' => 'Contact']);
+    }
 }
+

@@ -14,10 +14,42 @@ final class Router
      * Initialise le routeur avec les routes configurées
      * @param array<int, array{0:string,1:string,2:array{0:class-string,1:string}} > $routes
      */
-    public function __construct(array $routes)
+    public function __construct(array $routes = [])
     {
         // Mémorise les routes fournies
         $this->routes = $routes;
+    }
+
+    /**
+     * Enregistre une route GET
+     * @param string $path Le chemin de la route
+     * @param string $handler Le gestionnaire au format 'Namespace\Controller@action'
+     */
+    public function get(string $path, string $handler): void
+    {
+        $this->registerRoute('GET', $path, $handler);
+    }
+
+    /**
+     * Enregistre une route POST
+     * @param string $path Le chemin de la route
+     * @param string $handler Le gestionnaire au format 'Namespace\Controller@action'
+     */
+    public function post(string $path, string $handler): void
+    {
+        $this->registerRoute('POST', $path, $handler);
+    }
+
+    /**
+     * Enregistre une route
+     * @param string $method La méthode HTTP
+     * @param string $path Le chemin de la route
+     * @param string $handler Le gestionnaire au format 'Namespace\Controller@action'
+     */
+    private function registerRoute(string $method, string $path, string $handler): void
+    {
+        [$class, $action] = explode('@', $handler);
+        $this->routes[] = [$method, $path, [$class, $action]];
     }
 
     // Dirige la requête vers le bon contrôleur en fonction méthode/URI

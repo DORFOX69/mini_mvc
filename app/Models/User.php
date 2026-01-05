@@ -1,60 +1,73 @@
 <?php
 
-// Ici je définit le namespace ou il y aura ma class
+declare(strict_types=1);
+
 namespace Mini\Models;
 
-use Mini\Core\Database;
-use PDO;
+use Mini\Core\Model;
 
-class User
+/**
+ * Modèle User - Gestion des utilisateurs
+ */
+class User extends Model
 {
-    private $id;
-    private $nom;
-    private $email;
-
-    // =====================
-    // Getters / Setters
-    // =====================
-
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    public function getnom()
-    {
-        return $this->nom;
-    }
-
-    public function setNom($nom)
-    {
-        $this->nom = $nom;
-    }
-
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    public function setEmail($email)
-    {
-        $this->email = $email;
-    }
-
-    // =====================
-    // Méthodes CRUD
-    // =====================
+    protected string $table = 'users';
 
     /**
-     * Récupère tous les utilisateurs
-     * @return array
+     * Crée un nouvel utilisateur avec mot de passe hashé
+     * @param array $data Données de l'utilisateur
+     * @return int ID du nouvel utilisateur
      */
-    public static function getAll()
+    public function register(array $data): int
+    {
+        // Hash du mot de passe
+        $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
+        
+        return $this->create($data);
+    }
+
+    /**
+     * Vérifie les identifiants de connexion
+     * @param string $email Email de l'utilisateur
+     * @param string $password Mot de passe en clair
+     * @return array|null Données de l'utilisateur si valides
+     */
+    public function authenticate(string $email, string $password): ?array
+    {
+        $user = $this->findOneWhere('email = ?', [$email]);
+        
+        if ($user && password_verify($password, $user['password'])) {
+            return $user;
+        }
+        
+        return null;
+    }
+
+    /**
+     * Récupère un utilisateur par email
+     * @param string $email
+     * @return array|null
+     */
+    public function findByEmail(string $email): ?array
+    {
+        return $this->findOneWhere('email = ?', [$email]);
+    }
+
+/**
+ * Vérifie si un email existe
+ * @param string $email
+ * @return bool
+ */
+public function emailExists(string $email): bool
+{
+    return $this->findByEmail($email) !== null;
+}
+
+/**
+ * Récupère tous les utilisateurs
+ * @return array
+ */
+public static function getAll()
     {
         $pdo = Database::getPDO();
         $stmt = $pdo->query("SELECT * FROM user ORDER BY id DESC");
@@ -71,19 +84,6 @@ class User
         $pdo = Database::getPDO();
         $stmt = $pdo->prepare("SELECT * FROM user WHERE id = ?");
         $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Récupère un utilisateur par son email
-     * @param string $email
-     * @return array|null
-     */
-    public static function findByEmail($email)
-    {
-        $pdo = Database::getPDO();
-        $stmt = $pdo->prepare("SELECT * FROM user WHERE email = ?");
-        $stmt->execute([$email]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 

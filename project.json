@@ -1,0 +1,162 @@
+{
+  "project": {
+    "name": "E-Shop E-Commerce",
+    "version": "1.0.0",
+    "description": "Application e-commerce complète en PHP Vanilla",
+    "author": "Développeur",
+    "license": "MIT",
+    "created": "2026-01-05",
+    "language": "PHP",
+    "framework": "Aucun (PHP Vanilla)",
+    "database": "MySQL"
+  },
+  "requirements": {
+    "php": ">=7.4",
+    "mysql": ">=5.7",
+    "extensions": ["pdo", "pdo_mysql", "session", "filter"]
+  },
+  "features": {
+    "minimum": {
+      "homepage": "✅ Page d'accueil avec produits",
+      "product_detail": "✅ Page détail produit",
+      "cart_system": "✅ Système de panier",
+      "authentication": "✅ Inscription et connexion",
+      "checkout": "✅ Passage de commande",
+      "customer_space": "✅ Espace client"
+    },
+    "bonus": {
+      "responsive_design": "✅ Interface responsive",
+      "stock_management": "✅ Gestion du stock",
+      "category_filter": "✅ Filtrage par catégories",
+      "search": "✅ Recherche de produits",
+      "advanced_security": "✅ Sécurité avancée"
+    }
+  },
+  "installation": {
+    "step1": "Importer database.sql",
+    "step2": "Configurer app/config.ini",
+    "step3": "Lancer: php -S localhost:8000 -t public/",
+    "step4": "Accéder à: http://localhost:8000",
+    "step5": "Se connecter avec test@example.com / password"
+  },
+  "structure": {
+    "app": {
+      "config.ini": "Configuration MySQL",
+      "Core": {
+        "Database.php": "Connexion MySQL (Singleton)",
+        "Model.php": "Classe de base CRUD",
+        "Router.php": "Routeur HTTP",
+        "Controller.php": "Contrôleur de base"
+      },
+      "Models": {
+        "User.php": "Gestion utilisateurs",
+        "Product.php": "Catalogue produits",
+        "Category.php": "Catégories",
+        "Cart.php": "Panier",
+        "Order.php": "Commandes",
+        "OrderItem.php": "Articles commande"
+      },
+      "Controllers": {
+        "HomeController.php": "Accueil",
+        "AuthController.php": "Authentification",
+        "ProductController.php": "Produits",
+        "CartController.php": "Panier",
+        "OrderController.php": "Commandes"
+      },
+      "Views": {
+        "layout.php": "Layout principal",
+        "home": ["index.php", "about.php", "contact.php"],
+        "product": ["index.php", "show.php"],
+        "auth": ["login.php", "register.php"],
+        "cart": ["index.php"],
+        "order": ["checkout.php", "index.php", "show.php"]
+      }
+    },
+    "public": {
+      "index.php": "Point d'entrée (Routes)"
+    },
+    "database": {
+      "tables": 6,
+      "list": ["categories", "products", "users", "carts", "orders", "order_items"]
+    },
+    "documentation": {
+      "START_HERE.txt": "Fichier de démarrage",
+      "QUICK_START.md": "Démarrage rapide",
+      "INSTALL.md": "Guide d'installation",
+      "README_ECOMMERCE.md": "Documentation complète",
+      "TASKS.md": "Fonctionnalités",
+      "DELIVERABLES.md": "Checklist"
+    }
+  },
+  "database": {
+    "tables": [
+      {
+        "name": "categories",
+        "columns": ["id", "name", "description", "created_at"]
+      },
+      {
+        "name": "products",
+        "columns": ["id", "name", "description", "price", "stock", "category_id", "image_url", "created_at", "updated_at"]
+      },
+      {
+        "name": "users",
+        "columns": ["id", "email", "password", "first_name", "last_name", "phone", "address", "city", "postal_code", "country", "created_at", "updated_at"]
+      },
+      {
+        "name": "carts",
+        "columns": ["id", "user_id", "product_id", "quantity", "created_at", "updated_at"]
+      },
+      {
+        "name": "orders",
+        "columns": ["id", "user_id", "total_price", "status", "created_at", "updated_at"]
+      },
+      {
+        "name": "order_items",
+        "columns": ["id", "order_id", "product_id", "quantity", "unit_price", "created_at"]
+      }
+    ],
+    "test_data": {
+      "categories": 5,
+      "products": 10,
+      "users": 1,
+      "test_account": {
+        "email": "test@example.com",
+        "password": "password"
+      }
+    }
+  },
+  "security": {
+    "password_hashing": "bcrypt (password_hash/password_verify)",
+    "sql_injection_prevention": "Prepared statements PDO",
+    "xss_prevention": "htmlspecialchars()",
+    "csrf_protection": "Sessions PHP",
+    "session_management": "Gestion de session standard"
+  },
+  "routes": {
+    "home": "/",
+    "about": "/about",
+    "contact": "/contact",
+    "login": "/login",
+    "register": "/register",
+    "logout": "/logout",
+    "products": "/products",
+    "product_detail": "/product/show?id=X",
+    "cart": "/cart",
+    "cart_add": "/cart/add",
+    "checkout": "/checkout",
+    "orders": "/orders",
+    "order_detail": "/order/show?id=X"
+  },
+  "testing": {
+    "test_account": "test@example.com / password",
+    "test_products": 10,
+    "test_categories": 5
+  },
+  "notes": {
+    "architecture": "MVC Vanilla",
+    "patterns": ["Singleton (Database)", "Factory (Models)", "Template Method (Controller)"],
+    "design": "Responsive CSS intégré",
+    "performance": "Indexes sur les clés étrangères",
+    "scalability": "Architecture extensible"
+  }
+}

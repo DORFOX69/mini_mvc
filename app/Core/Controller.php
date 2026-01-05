@@ -6,11 +6,25 @@ namespace Mini\Core;
 // Déclare une classe abstraite de contrôleur de base
 class Controller
 {
+    // Stocke les paramètres de route
+    protected array $params = [];
+
+    /**
+     * Définit les paramètres de route
+     * @param array<string, string> $params
+     */
+    public function setParams(array $params): void
+    {
+        $this->params = $params;
+    }
+
     // Méthode utilitaire pour rendre une vue avec des paramètres
     protected function render(string $view, array $params = []): void
     {
+        // Fusionne les paramètres de route avec les paramètres de rendu
+        $allParams = array_merge($this->params, $params);
         // Extrait les paramètres en variables locales, sans écraser les existantes
-        extract(array: $params);
+        extract(array: $allParams);
         // Construit le chemin du fichier de vue
         $viewFile = dirname(__DIR__) . '/Views/' . $view . '.php';
         // Construit le chemin du layout principal
@@ -28,5 +42,3 @@ class Controller
         require $layoutFile;
     }
 }
-
-

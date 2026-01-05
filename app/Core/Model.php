@@ -1,70 +1,148 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mini\Core;
 
-// Modele de base : c'est la classe mère dont vont hériter TOUS les models
-// Cette classe n'est pas destinée à être instancié, mais seulement à être héritée
-class Model
+use PDO;
+
+/**
+ * Classe Model - Classe de base pour tous les modèles
+ * Fournit les méthodes CRUD de base
+ */
+abstract class Model
 {
-    // Ici on veut éviter de répéter les propriétés présentes dans tous les Models
-    // On factorise dans la classe "parent" de tous les Models => donc ici meme CoreModel
-    // Les propriétés doivent être en protected car on veut pouvoir les utiliser dans les classe enfant (avant ça, elles etaient en private)
+    /** @var string Nom de la table */
+    protected string $table = '';
 
-    protected $id;
-    protected $created_at;
-    protected $updated_at;
+    /** @var PDO */
+    protected PDO $db;
 
     /**
-     * Get the value of id
-     */ 
-    public function getId()
+     * Constructeur - Initialise la connexion PDO
+     */
+    public function __construct()
     {
-        return $this->id;
+        $this->db = Database::getPDO();
     }
 
     /**
-     * Set the value of id
-     *
-     * @return  self
-     */ 
-    public function setId($id)
+     * Récupère tous les enregistrements
+     * @return array
+     */
+    public function findAll(): array
     {
-        $this->id = $id;
+        $sql = "SELECT * FROM {$this->table}";
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll();
     }
 
     /**
-     * Get the value of updated_at
-     */ 
-    public function getUpdated_at()
+     * Récupère un enregistrement par ID
+     * @param int $id
+     * @return array|null
+     */
+    public function findById(int $id): ?array
     {
-        return $this->updated_at;
+        $sql = "SELECT * FROM {$this->table} WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$id]);
+        $result = $stmt->fetch();
+        return $result !== false ? $result : null;
     }
 
     /**
-     * Set the value of updated_at
-     *
-     * @return  self
-     */ 
-    public function setUpdated_at($updated_at)
+     * Récupère les enregistrements avec une condition
+     * @param string $where Clause WHERE
+     * @param array $params Paramètres de la requête
+     * @return array
+     */
+    public function findWhere(string $where, array $params = []): array
     {
-        $this->updated_at = $updated_at;
+        $sql = "SELECT * FROM {$this->table} WHERE {$where}";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
     }
 
     /**
-     * Get the value of created_at
-     */ 
-    public function getCreated_at()
+     * Récupère un seul enregistrement avec une condition
+     * @param string $where Clause WHERE
+     * @param array $params Paramètres de la requête
+     * @return array|null
+     */
+    public function findOneWhere(string $where, array $params = []): ?array
     {
-        return $this->created_at;
+        $sql = "SELECT * FROM {$this->table} WHERE {$where}";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        $result = $stmt->fetch();
+        return $result !== false ? $result : null;
     }
 
     /**
-     * Set the value of created_at
-     *
-     * @return  self
-     */ 
-    public function setCreated_at($created_at)
+     * Crée un nouvel enregistrement
+     * @param array $data Données à insérer
+     * @return int ID de l'enregistrement créé
+     */
+    public function create(array $data): int
     {
-        $this->created_at = $created_at;
+        $columns = implode(', ', array_keys($data));
+        $placeholders = implode(', ', array_fill(0, count($data), '?'));
+        
+        $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(array_values($data));
+        
+        return (int)$this->db->lastInsertId();
+    }
+
+    /**
+     * Met à jour un enregistrement
+     * @param int $id ID de l'enregistrement
+     * @param array $data Données à mettre à jour
+     * @return bool
+     */
+    public function update(int $id, array $data): bool
+    {
+        $setClause = implode(', ', array_map(fn($key) => "$key = ?", array_keys($data)));
+        $values = array_values($data);
+        $values[] = $id;
+        
+        $sql = "UPDATE {$this->table} SET {$setClause} WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute($values);
+    }
+
+    /**
+     * Supprime un enregistrement
+     * @param int $id ID de l'enregistrement
+     * @return bool
+     */
+    public function delete(int $id): bool
+    {
+        $sql = "DELETE FROM {$this->table} WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$id]);
+    }
+
+    /**
+     * Compte les enregistrements
+     * @param string $where Clause WHERE optionnelle
+     * @param array $params Paramètres optionnels
+     * @return int
+     */
+    public function count(string $where = '', array $params = []): int
+    {
+        $sql = "SELECT COUNT(*) as count FROM {$this->table}";
+        if ($where) {
+            $sql .= " WHERE {$where}";
+        }
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        $result = $stmt->fetch();
+        
+        return (int)($result['count'] ?? 0);
     }
 }

@@ -1,46 +1,57 @@
 <?php
 
-// Retenir son utilisation  => Database::getPDO()
-// Design Pattern : Singleton
-/**
- * Classe qui va nous permettre de nous connecter à notre base de données = oshop
- */
 namespace Mini\Core;
 
 use PDO;
 
+/**
+ * Classe Database - Gestion de la connexion à la base de données
+ * Utilise le pattern Singleton pour une seule instance
+ */
 class Database
 {
-    /** @var PDO */
-    private $dbh;
-    private static $_instance;
+    /** @var PDO|null */
+    private ?PDO $dbh = null;
+    
+    /** @var Database|null */
+    private static ?Database $_instance = null;
+
+    /**
+     * Constructeur privé - Pattern Singleton
+     */
     private function __construct()
     {
-        // Récupération des données du fichier de config
-        // la fonction parse_ini_file parse le fichier et retourne un array associatif
-        $configData = parse_ini_file(__DIR__ . '/../config.ini');
+        // Récupération des données du fichier de configuration
+        $configData = parse_ini_file(dirname(__DIR__) . '/config.ini');
 
         try {
+            // Connexion à PostgreSQL
+            $dsn = "pgsql:host={$configData['DB_HOST']};port={$configData['DB_PORT']};dbname={$configData['DB_NAME']}";
+            
             $this->dbh = new PDO(
-                "mysql:host={$configData['DB_HOST']};dbname={$configData['DB_NAME']};charset=utf8",
+                $dsn,
                 $configData['DB_USERNAME'],
                 $configData['DB_PASSWORD'],
-                array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING) // Affiche les erreurs SQL à l'écran
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                ]
             );
-        } catch (\Exception $exception) {
-            echo 'Erreur de connexion...<br>';
+        } catch (\PDOException $exception) {
+            echo 'Erreur de connexion à la base de données...<br>';
             echo $exception->getMessage() . '<br>';
-            echo '<pre>';
-            echo $exception->getTraceAsString();
-            echo '</pre>';
             exit;
         }
     }
-    // the unique method you need to use
-    public static function getPDO()
+
+    /**
+     * Récupère l'instance PDO - Pattern Singleton
+     * @return PDO
+     */
+    public static function getPDO(): PDO
     {
-        // If no instance => create one
-        if (empty(self::$_instance)) {
+        if (self::$_instance === null) {
             self::$_instance = new Database();
         }
         return self::$_instance->dbh;
