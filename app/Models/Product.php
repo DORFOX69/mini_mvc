@@ -71,11 +71,12 @@ class Product extends Model
      */
     public function search(string $term): array
     {
+        // Use ILIKE for case-insensitive search on PostgreSQL
         $sql = "SELECT p.*, c.name as category_name 
-                FROM {$this->table} p 
-                JOIN categories c ON p.category_id = c.id
-                WHERE p.name LIKE ? OR p.description LIKE ?
-                ORDER BY p.name ASC";
+            FROM {$this->table} p 
+            JOIN categories c ON p.category_id = c.id
+            WHERE p.name ILIKE ? OR p.description ILIKE ?
+            ORDER BY p.name ASC";
         
         $param = "%{$term}%";
         $stmt = $this->db->prepare($sql);

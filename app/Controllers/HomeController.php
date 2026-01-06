@@ -20,15 +20,28 @@ final class HomeController extends Controller
     {
         $productModel = new Product();
         $categoryModel = new Category();
-        
-        // Récupère tous les produits
-        $products = $productModel->getAllWithCategory();
         // Récupère les catégories avec le compte de produits
         $categories = $categoryModel->getAllWithCount();
-        
+
+        // Si une catégorie est sélectionnée via ?category=ID, filtre les produits
+        $selectedCategory = null;
+        $products = [];
+
+        $catId = isset($_GET['category']) ? (int)$_GET['category'] : null;
+        if ($catId && $catId > 0) {
+            $selectedCategory = $categoryModel->findById($catId);
+            if ($selectedCategory) {
+                $products = $productModel->getByCategory((int)$catId);
+            }
+        } else {
+            // Aucun filtre : récupérer tous les produits
+            $products = $productModel->getAllWithCategory();
+        }
+
         $this->render('home/index', [
             'products' => $products,
             'categories' => $categories,
+            'selectedCategory' => $selectedCategory,
             'pageTitle' => 'Accueil'
         ]);
     }

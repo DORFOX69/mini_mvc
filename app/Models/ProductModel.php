@@ -11,7 +11,7 @@ use Mini\Core\Model;
  */
 class Product extends Model
 {
-    protected string $table = 'products';
+    protected string $table = 'product';
 
     /**
      * Récupère tous les produits avec leurs catégories

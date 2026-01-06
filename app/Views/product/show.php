@@ -16,7 +16,8 @@
         <div>
             <img src="<?= htmlspecialchars($product['image_url'] ?? 'https://via.placeholder.com/500') ?>" 
                  alt="<?= htmlspecialchars($product['name']) ?>" 
-                 style="width: 100%; border-radius: 8px;">
+                 style="width: 100%; border-radius: 8px;"
+                 onerror="this.onerror=null;this.src='https://via.placeholder.com/500'">
         </div>
         
         <!-- Informations du produit -->

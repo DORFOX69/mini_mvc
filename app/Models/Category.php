@@ -28,4 +28,18 @@ class Category extends Model
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
     }
+
+    /**
+     * Trouve une catégorie par son ID
+     * @param int $id
+     * @return array|null
+     */
+    public function findById(int $id): ?array
+    {
+        $sql = "SELECT * FROM {$this->table} WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$id]);
+        $res = $stmt->fetch();
+        return $res !== false ? $res : null;
+    }
 }

@@ -67,11 +67,9 @@ public function emailExists(string $email): bool
  * Récupère tous les utilisateurs
  * @return array
  */
-public static function getAll()
+public function getAll(): array
     {
-        $pdo = Database::getPDO();
-        $stmt = $pdo->query("SELECT * FROM user ORDER BY id DESC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->findAll();
     }
 
     /**
@@ -79,44 +77,11 @@ public static function getAll()
      * @param int $id
      * @return array|null
      */
-    public static function findById($id)
-    {
-        $pdo = Database::getPDO();
-        $stmt = $pdo->prepare("SELECT * FROM user WHERE id = ?");
-        $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+    // use inherited findById from Model (instance method)
 
     /**
      * Crée un nouvel utilisateur
      * @return bool
      */
-    public function save()
-    {
-        $pdo = Database::getPDO();
-        $stmt = $pdo->prepare("INSERT INTO user (nom, email) VALUES (?, ?)");
-        return $stmt->execute([$this->nom, $this->email]);
-    }
-
-    /**
-     * Met à jour les informations d’un utilisateur existant
-     * @return bool
-     */
-    public function update()
-    {
-        $pdo = Database::getPDO();
-        $stmt = $pdo->prepare("UPDATE user SET nom = ?, email = ? WHERE id = ?");
-        return $stmt->execute([$this->nom, $this->email, $this->id]);
-    }
-
-    /**
-     * Supprime un utilisateur
-     * @return bool
-     */
-    public function delete()
-    {
-        $pdo = Database::getPDO();
-        $stmt = $pdo->prepare("DELETE FROM user WHERE id = ?");
-        return $stmt->execute([$this->id]);
-    }
+    // For CRUD operations, use the base Model methods: create(), update(id, data), delete(id)
 }

@@ -358,7 +358,6 @@
             <a href="/" class="logo">E-Shop</a>
             <div class="nav-links">
                 <a href="/">Accueil</a>
-                <a href="/?search">Rechercher</a>
                 <div class="user-menu">
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <span>Bienvenue, <?= htmlspecialchars($_SESSION['user_name']) ?></span>

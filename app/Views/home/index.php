@@ -51,7 +51,8 @@
                     <div class="product-card">
                         <div class="product-image">
                             <img src="<?= htmlspecialchars($product['image_url'] ?? 'https://via.placeholder.com/300') ?>" 
-                                 alt="<?= htmlspecialchars($product['name']) ?>">
+                                 alt="<?= htmlspecialchars($product['name']) ?>"
+                                 onerror="this.onerror=null;this.src='https://via.placeholder.com/300'">
                         </div>
                         
                         <div class="product-info">
